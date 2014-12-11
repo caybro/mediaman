@@ -33,6 +33,10 @@ ApplicationWindow {
         settings.lastDirUrl = fileDialog.folder
     }
 
+    SystemPalette {
+        id: palette
+    }
+
     ErrorDialog {
         id: errorDlg
     }
@@ -267,7 +271,7 @@ ApplicationWindow {
         id: welcomeText
         anchors.centerIn: parent
         visible: player.status == MediaPlayer.NoMedia
-        color: "yellow"
+        color: palette.highlight
         text: qsTr("<h1>Welcome to Mediaman</h1>No media loaded.<br>Press %1 to open some...").arg(openAction.shortcut) +
                    "<br><br><br><br>" + "(c) 2014 Lukáš Tinkl &lt;<a href='mailto:lukas@kde.org'>lukas@kde.org</a>&gt;";
         onLinkActivated: {
@@ -279,7 +283,12 @@ ApplicationWindow {
         id: osd
         anchors.right: parent.right
         anchors.top: parent.top
-        color: "yellow"
+        color: palette.highlight
+        font {
+            pointSize: 18
+            capitalization: Font.AllUppercase
+        }
+
         text: {
             if (player.playbackState == MediaPlayer.PausedState)
                 return qsTr("Paused");
