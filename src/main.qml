@@ -81,7 +81,7 @@ ApplicationWindow {
         id: playAction
         text: player.playbackState == MediaPlayer.PlayingState ? qsTr("P&ause") : qsTr("P&lay")
         iconName: player.playbackState == MediaPlayer.PlayingState ? "media-playback-pause" : "media-playback-start"
-        shortcut: Qt.Key_Space
+        shortcut: Qt.Key_MediaPlay
         enabled: player.status > MediaPlayer.Loading && player.status < MediaPlayer.InvalidMedia
         onTriggered: player.playbackState == MediaPlayer.PlayingState ? player.pause() : player.play()
     }
@@ -111,7 +111,7 @@ ApplicationWindow {
         id: fullscreenAction
         text: qsTr("View &Fullscreen")
         iconName: "view-fullscreen"
-        shortcut: StandardKey.FullScreen
+        shortcut: "F11"
         checkable: true
         checked: mainWindow.visibility == Window.FullScreen
         onTriggered: toggleFullscreen()
@@ -189,7 +189,8 @@ ApplicationWindow {
                 onValueChanged: {
                     player.volume = value
                 }
-                Layout.preferredWidth: 200
+                Layout.fillWidth: true
+                Layout.maximumWidth: 100
             }
             ToolButton {
                 action: muteAction
@@ -225,9 +226,7 @@ ApplicationWindow {
         selectMultiple: false
         modality: Qt.NonModal
         folder: settings.lastDirUrl
-        nameFilters: [ qsTr("Video files (*.avi *.mkv *.mp4)"),
-            qsTr("Audio files (*.mp3 *.ogg *.flac *.wav)"),
-            qsTr("All files (*)") ]
+        nameFilters: [ qsTr("Media files (*.avi *.mkv *.mp4 *.mp3 *.ogg *.flac *.wav)"), qsTr("All files (*)") ]
         onAccepted: {
             var url = fileDialog.fileUrl
             //console.log("You chose: " + url)
@@ -237,11 +236,14 @@ ApplicationWindow {
     }
 
     Rectangle {
+        id: playerRect
         color: "black"
         anchors.fill: parent
         activeFocusOnTab: true
+        focus: true
         MouseArea {
             anchors.fill: parent
+            cursorShape: mainWindow.visibility == Window.FullScreen ? Qt.BlankCursor : Qt.ArrowCursor
             onDoubleClicked: {
                 fullscreenAction.trigger()
             }
@@ -250,20 +252,15 @@ ApplicationWindow {
                 anchors.fill: parent
                 source: player
                 visible: player.playbackState != MediaPlayer.StoppedState
-                focus: true
-
-                Keys.onPressed: {
-                    if (event.key == Qt.Key_Escape && mainWindow.visibility == Window.FullScreen) { // escape fullscreen
-                        mainWindow.visibility = Window.Windowed;
-                    } else if (event.key == Qt.Key_F11) { // toggle fullscreen
-                        fullscreenAction.trigger()
-                    } else if (event.key == Qt.Key_Space) { // play/pause
-                        playAction.trigger();
-                    }
-                }
             }
         }
-        Keys.forwardTo: video
+        Keys.onPressed: {
+            if (event.key == Qt.Key_Escape && mainWindow.visibility == Window.FullScreen) { // escape fullscreen
+                mainWindow.visibility = Window.Windowed;
+            } else if (event.key == Qt.Key_Space) { // play/pause
+                playAction.trigger();
+            }
+        }
     }
 
     function toggleFullscreen() {
@@ -271,6 +268,7 @@ ApplicationWindow {
             mainWindow.visibility = Window.Windowed
         else {
             mainWindow.visibility = Window.FullScreen
+            playerRect.forceActiveFocus()
         }
     }
 }
