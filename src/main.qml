@@ -66,7 +66,7 @@ ApplicationWindow {
     Action {
         id: openAction
         text: qsTr("&Open")
-        tooltip: qsTr("Open File")
+        tooltip: qsTr("Open File") + " (" + shortcut + ")"
         iconName: "document-open"
         shortcut: StandardKey.Open
         onTriggered: fileDialog.open()
@@ -75,7 +75,7 @@ ApplicationWindow {
     Action {
         id: quitAction
         text: qsTr("&Quit")
-        tooltip: qsTr("Exit application")
+        tooltip: qsTr("Exit application") + " (" + shortcut + ")"
         iconName: "application-exit"
         shortcut: StandardKey.Quit
         onTriggered: Qt.quit();
@@ -102,7 +102,8 @@ ApplicationWindow {
     Action {
         id: muteAction
         text: qsTr("&Mute")
-        tooltip: player.muted ? qsTr("Audio muted, click to unmute") : qsTr("Mute audio")
+        tooltip: player.muted ? qsTr("Audio muted, click to unmute") + " (" + shortcut + ")"
+                              : qsTr("Mute audio") + " (" + shortcut + ")"
         iconName: player.muted ? "audio-volume-muted" : "player-volume"
         shortcut: "Ctrl+M"
         onTriggered: player.muted = !player.muted
@@ -114,6 +115,7 @@ ApplicationWindow {
     Action {
         id: fullscreenAction
         text: qsTr("View &Fullscreen")
+        tooltip: text.replace('&', '') + " (" + shortcut + ")"
         iconName: "view-fullscreen"
         shortcut: "F11"
         checkable: true
@@ -272,8 +274,9 @@ ApplicationWindow {
         anchors.centerIn: parent
         visible: player.status == MediaPlayer.NoMedia
         color: palette.highlight
-        text: qsTr("<h1>Welcome to Mediaman</h1>No media loaded.<br>Press %1 to open some...").arg(openAction.shortcut) +
-                   "<br><br><br><br>" + "(c) 2014 Lukáš Tinkl &lt;<a href='mailto:lukas@kde.org'>lukas@kde.org</a>&gt;";
+        text: qsTr("<h1>Welcome to Mediaman %1</h1>No media loaded.<br>Press %2 to open some...")
+          .arg(Qt.application.version).arg(openAction.shortcut) +
+          "<br><br><br><br>" + "(c) 2014 Lukáš Tinkl &lt;<a href='mailto:lukas@kde.org'>lukas@kde.org</a>&gt;";
         onLinkActivated: {
             Qt.openUrlExternally(link)
         }

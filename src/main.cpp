@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("KDE");
     app.setOrganizationDomain("kde.org");
     app.setApplicationName("Mediaman");
+    app.setApplicationVersion("0.1");
 
     QTranslator appTrans;
     appTrans.load(QStringLiteral(":/translations/mediaman_") + QLocale::system().name());
