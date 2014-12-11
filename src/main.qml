@@ -25,7 +25,7 @@ ApplicationWindow {
         // save volume
         property real volume: 0.5
         // save last directory
-        property url lastDirUrl: "file://home/ltinkl/Videos" // FIXME
+        property url lastDirUrl: moviesPath
     }
 
     Component.onDestruction: {
@@ -280,8 +280,16 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.top: parent.top
         color: "yellow"
-        text: qsTr("Paused")
-        visible: player.playbackState == MediaPlayer.PausedState
+        text: {
+            if (player.playbackState == MediaPlayer.PausedState)
+                return qsTr("Paused");
+            else if (player.muted)
+                return qsTr("Muted");
+            else
+                return ""
+        }
+
+        visible: player.playbackState == MediaPlayer.PausedState || player.muted
     }
 
     function toggleFullscreen() {

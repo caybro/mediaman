@@ -2,6 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QIcon>
 #include <QTranslator>
+#include <QQmlContext>
+#include <QStandardPaths>
 #include <QDebug>
 
 int main(int argc, char *argv[])
@@ -17,6 +19,10 @@ int main(int argc, char *argv[])
     app.installTranslator(&appTrans);
 
     QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("moviesPath",
+                                             QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first()));
+    engine.rootContext()->setContextProperty("musicPath",
+                                             QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first()));
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();
