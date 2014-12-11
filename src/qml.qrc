@@ -3,5 +3,6 @@
         <file>main.qml</file>
         <file>functions.js</file>
         <file>ErrorDialog.qml</file>
+        <file>translations/mediaman_cs.qm</file>
     </qresource>
 </RCC>

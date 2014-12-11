@@ -226,7 +226,7 @@ ApplicationWindow {
         selectMultiple: false
         modality: Qt.NonModal
         folder: settings.lastDirUrl
-        nameFilters: [ qsTr("Media files (*.avi *.mkv *.mp4 *.mp3 *.ogg *.flac *.wav)"), qsTr("All files (*)") ]
+        nameFilters: [ qsTr("Media files") + " (*.avi *.mkv *.mp4 *.mp3 *.ogg *.flac *.wav)", qsTr("All files") + " (*)" ]
         onAccepted: {
             var url = fileDialog.fileUrl
             //console.log("You chose: " + url)
@@ -261,6 +261,27 @@ ApplicationWindow {
                 playAction.trigger();
             }
         }
+    }
+
+    Text {
+        id: welcomeText
+        anchors.centerIn: parent
+        visible: player.status == MediaPlayer.NoMedia
+        color: "yellow"
+        text: qsTr("<h1>Welcome to Mediaman</h1>No media loaded.<br>Press %1 to open some...").arg(openAction.shortcut) +
+                   "<br><br><br><br>" + "(c) 2014 Lukáš Tinkl &lt;<a href='mailto:lukas@kde.org'>lukas@kde.org</a>&gt;";
+        onLinkActivated: {
+            Qt.openUrlExternally(link)
+        }
+    }
+
+    Text {
+        id: osd
+        anchors.right: parent.right
+        anchors.top: parent.top
+        color: "yellow"
+        text: qsTr("Paused")
+        visible: player.playbackState == MediaPlayer.PausedState
     }
 
     function toggleFullscreen() {

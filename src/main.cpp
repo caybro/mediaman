@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QIcon>
+#include <QTranslator>
 #include <QDebug>
 
 int main(int argc, char *argv[])
@@ -11,7 +12,9 @@ int main(int argc, char *argv[])
     app.setOrganizationDomain("kde.org");
     app.setApplicationName("Mediaman");
 
-    // TODO load translations
+    QTranslator appTrans;
+    appTrans.load(QStringLiteral(":/translations/mediaman_") + QLocale::system().name());
+    app.installTranslator(&appTrans);
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
