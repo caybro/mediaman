@@ -16,11 +16,21 @@ ApplicationWindow {
     height: 480
 
     Settings {
+        id: settings
         // save window size and position
         property alias x: mainWindow.x
         property alias y: mainWindow.y
         property alias width: mainWindow.width
         property alias height: mainWindow.height
+        // save volume
+        property real volume: 0.5
+        // save last directory
+        property url lastDirUrl: "file://home/ltinkl/Videos" // FIXME
+    }
+
+    Component.onDestruction: {
+        settings.volume = player.volume
+        settings.lastDirUrl = fileDialog.folder
     }
 
     ErrorDialog {
@@ -29,6 +39,7 @@ ApplicationWindow {
 
     MediaPlayer {
         id: player
+        volume: settings.volume
         onStatusChanged: {
             if (status == MediaPlayer.Buffered) {
                 if (!hasVideo) {
@@ -213,7 +224,7 @@ ApplicationWindow {
         selectExisting: true
         selectMultiple: false
         modality: Qt.NonModal
-        folder: "file://home/ltinkl/Videos" // FIXME
+        folder: settings.lastDirUrl
         nameFilters: [ qsTr("Video files (*.avi *.mkv *.mp4)"),
             qsTr("Audio files (*.mp3 *.ogg *.flac *.wav)"),
             qsTr("All files (*)") ]
