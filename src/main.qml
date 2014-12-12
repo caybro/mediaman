@@ -57,8 +57,9 @@ ApplicationWindow {
             messageTimer.start()
 
             if (status == MediaPlayer.Buffered) {
-                if (!hasVideo) {
-                    mainWindow.title = metaData.title.trim() + " - " + metaData.albumArtist.trim() + " — " + qsTr("Mediaman")
+                if (!hasVideo && metaData !== undefined) {
+                    mainWindow.title = metaData.title.trim() + " - " + metaData.albumArtist.trim() +
+                            " (" + metaData.albumTitle.trim() + ") — " + qsTr("Mediaman")
                 } else {
                     mainWindow.title = Functions.filenameFromUrl(source.toString()) + " — " + qsTr("Mediaman")
                 }
@@ -86,7 +87,7 @@ ApplicationWindow {
     Action {
         id: quitAction
         text: qsTr("&Quit")
-        tooltip: qsTr("Exit application") + " (" + shortcut + ")"
+        tooltip: qsTr("Exit Application") + " (" + shortcut + ")"
         iconName: "application-exit"
         shortcut: StandardKey.Quit
         onTriggered: Qt.quit();
@@ -245,7 +246,8 @@ ApplicationWindow {
         selectMultiple: false
         modality: Qt.NonModal
         folder: settings.lastDirUrl
-        nameFilters: [ qsTr("Media files") + " (*.avi *.mkv *.mp4 *.mp3 *.ogg *.flac *.wav)", qsTr("All files") + " (*)" ]
+        nameFilters: [ qsTr("Media files") + " (*.avi *.mkv *.mp4 *.wmv *.ogv *.mp3 *.ogg *.oga *.flac *.wma *.wav)",
+            qsTr("All files") + " (*)" ]
         onAccepted: {
             var url = fileDialog.fileUrl
             //console.log("You chose: " + url)
@@ -271,6 +273,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 source: player
                 visible: player.playbackState != MediaPlayer.StoppedState
+                enabled: player.hasVideo
             }
         }
         Keys.onPressed: {
@@ -315,6 +318,31 @@ ApplicationWindow {
         }
 
         visible: player.playbackState == MediaPlayer.PausedState || player.muted
+    }
+
+    Text {
+        id: infoOsd
+        anchors.top: parent.top
+        anchors.left: parent.left
+        color: palette.highlight
+        visible: false //osd.visible // FIXME
+        text: {
+            var meta = player.metaData;
+            if (player.hasVideo) {
+                return "Resolution: " + meta.resolution + "<br>" +
+                        "Framerate: " + meta.videoFrameRate + "<br>" +
+                        "Bitrate: " + meta.videoBitRate + " b/s<br>" +
+                        "Codec: " + meta.videoCodec + "<br>";
+            } else if (player.hasAudio) {
+                return "Track: " + meta.trackNumber + "<br>" +
+                        "Audio codec: " + meta.audioCodec + "<br>" +
+                        "Bitrate: " + meta.audioBitRate + " b/s<br>" +
+                        "Sample rate: " + meta.sampleRate + " Hz<br>" +
+                        "Year: " + meta.year + "<br>" +
+                        "Genre: " + meta.lyrics;
+            }
+            return ""
+        }
     }
 
     function toggleFullscreen() {
