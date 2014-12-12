@@ -4,6 +4,8 @@
 #include <QTranslator>
 #include <QQmlContext>
 #include <QStandardPaths>
+#include <QCommandLineParser>
+#include <QDir>
 #include <QDebug>
 
 int main(int argc, char *argv[])
@@ -19,11 +21,34 @@ int main(int argc, char *argv[])
     appTrans.load(QStringLiteral(":/translations/mediaman_") + QLocale::system().name());
     app.installTranslator(&appTrans);
 
+    QCommandLineParser parser;
+    parser.setApplicationDescription(QApplication::tr("Simple mediaplayer based on QML"));
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addPositionalArgument("url", QApplication::tr("URL to open"), "[url]");
+    parser.process(app);
+
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("moviesPath",
                                              QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).first()));
     engine.rootContext()->setContextProperty("musicPath",
                                              QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::MusicLocation).first()));
+
+    QUrl url;
+    const QStringList args = parser.positionalArguments();
+    if (!args.isEmpty()) {
+        const QUrl tmp = args.first();
+        if (args.first().startsWith('/')) { // local absolute path
+            url = QUrl::fromLocalFile(args.first());
+        } else if (tmp.scheme().isEmpty()) { // local relative path
+            url = QUrl::fromLocalFile(QDir::currentPath() + '/' + args.first());
+        } else { // fully-qualified url
+            url = tmp;
+        }
+    }
+
+    engine.rootContext()->setContextProperty("playUrl", url);
+
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
     return app.exec();

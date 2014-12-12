@@ -43,6 +43,8 @@ ApplicationWindow {
 
     MediaPlayer {
         id: player
+        autoPlay: playUrl != ""
+        source: playUrl
         volume: settings.volume
         onStatusChanged: {
             if (status == MediaPlayer.Buffered) {
