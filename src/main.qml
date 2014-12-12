@@ -41,12 +41,21 @@ ApplicationWindow {
         id: errorDlg
     }
 
+    Timer {
+        id: messageTimer
+        interval: 3000 // 3 seconds
+        onTriggered: messageLabel.text = player.source
+    }
+
     MediaPlayer {
         id: player
         autoPlay: playUrl != ""
         source: playUrl
         volume: settings.volume
         onStatusChanged: {
+            messageLabel.text=Functions.mediaStatus2String(player.status)
+            messageTimer.start()
+
             if (status == MediaPlayer.Buffered) {
                 if (!hasVideo) {
                     mainWindow.title = metaData.title + " - " + metaData.albumArtist + " - " + qsTr("Mediaman")
@@ -211,12 +220,14 @@ ApplicationWindow {
 
     statusBar: StatusBar {
         id: statusBar
-        visible: mainWindow.visibility != Window.FullScreen
+        visible: !fullscreenAction.checked
         RowLayout {
             anchors.fill: parent
             Label {
                 id: messageLabel
-                text: Functions.mediaStatus2String(player.status)
+                elide: Text.ElideMiddle
+                width: statusBar.width - posLabel.width
+                text: player.source
             }
             Label {
                 id: posLabel
