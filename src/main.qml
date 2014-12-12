@@ -58,9 +58,9 @@ ApplicationWindow {
 
             if (status == MediaPlayer.Buffered) {
                 if (!hasVideo) {
-                    mainWindow.title = metaData.title + " - " + metaData.albumArtist + " - " + qsTr("Mediaman")
+                    mainWindow.title = metaData.title.trim() + " - " + metaData.albumArtist.trim() + " — " + qsTr("Mediaman")
                 } else {
-                    mainWindow.title = Functions.filenameFromUrl(source.toString()) + " - " + qsTr("Mediaman")
+                    mainWindow.title = Functions.filenameFromUrl(source.toString()) + " — " + qsTr("Mediaman")
                 }
             } else {
                 mainWindow.title = qsTr("Mediaman")
