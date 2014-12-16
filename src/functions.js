@@ -7,11 +7,11 @@ function mediaStatus2String(status) {
     case MediaPlayer.Loaded:
         return qsTr("Media loaded.");
     case MediaPlayer.Buffering:
-        return qsTr("Buffering...");
+        return qsTr("Buffering data...");
     case MediaPlayer.Stalled:
-        return qsTr("Stalled, playback interrupted");
+        return qsTr("Playback interrupted, buffering data...");
     case MediaPlayer.Buffered:
-        return qsTr("Media buffered.");
+        return qsTr("Media buffered, ready to play.");
     case MediaPlayer.EndOfMedia:
         return qsTr("End of media reached.");
     case MediaPlayer.InvalidMedia:

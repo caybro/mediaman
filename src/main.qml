@@ -57,10 +57,12 @@ ApplicationWindow {
             messageTimer.start()
 
             if (status == MediaPlayer.Buffered) {
-                if (!hasVideo && metaData !== undefined) {
+                if (source.toString().substr(0,4) == "http") { // stream
+                    mainWindow.title = metaData.publisher + " (" + metaData.genre + ") — " + qsTr("Mediaman")
+                } else if (!hasVideo && metaData !== undefined) { // MP3
                     mainWindow.title = metaData.title.trim() + " - " + metaData.albumArtist.trim() +
                             " (" + metaData.albumTitle.trim() + ") — " + qsTr("Mediaman")
-                } else {
+                } else { // video
                     mainWindow.title = Functions.filenameFromUrl(source.toString()) + " — " + qsTr("Mediaman")
                 }
             } else {
@@ -70,14 +72,15 @@ ApplicationWindow {
         onError: {
             // display error dialog
             console.error("MP error:" + error)
-            errorDlg.errorText = errorString
-            errorDlg.open()
+            messageLabel.text = errorString
+            messageTimer.start()
+            //errorDlg.open()
         }
     }
 
     Action {
         id: openAction
-        text: qsTr("&Open")
+        text: qsTr("&Open...")
         tooltip: qsTr("Open File") + " (" + shortcut + ")"
         iconName: "document-open"
         shortcut: StandardKey.Open
@@ -107,7 +110,7 @@ ApplicationWindow {
         text: qsTr("&Stop")
         iconName: "media-playback-stop"
         shortcut: Qt.Key_MediaStop
-        enabled: player.playbackState == MediaPlayer.PlayingState
+        enabled: player.playbackState == MediaPlayer.PlayingState || player.playbackState == MediaPlayer.PausedState
         onTriggered: player.stop()
     }
 
@@ -117,7 +120,7 @@ ApplicationWindow {
         tooltip: player.muted ? qsTr("Audio muted, click to unmute") + " (" + shortcut + ")"
                               : qsTr("Mute audio") + " (" + shortcut + ")"
         iconName: player.muted ? "audio-volume-muted" : "player-volume"
-        shortcut: "Ctrl+M"
+        shortcut: "M"
         onTriggered: player.muted = !player.muted
         checkable: true
         checked: player.muted
@@ -230,6 +233,11 @@ ApplicationWindow {
                 width: statusBar.width - posLabel.width
                 text: player.source
             }
+            ProgressBar {
+                id: progress
+                value: player.bufferProgress
+                visible: player.status == MediaPlayer.Buffering || player.status == MediaPlayer.Stalled
+            }
             Label {
                 id: posLabel
                 text: Functions.posDuration2String(player.position, player.duration)
@@ -253,6 +261,7 @@ ApplicationWindow {
             //console.log("You chose: " + url)
             player.source = url
             player.play()
+            settings.lastDirUrl = fileDialog.folder
         }
     }
 
@@ -303,6 +312,7 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.top: parent.top
         color: palette.highlight
+        anchors.margins: 5
         font {
             pointSize: 18
             capitalization: Font.AllUppercase
@@ -325,7 +335,8 @@ ApplicationWindow {
         anchors.top: parent.top
         anchors.left: parent.left
         color: palette.highlight
-        visible: false //osd.visible // FIXME
+        anchors.margins: 5
+        visible: !player.hasVideo
         text: {
             var meta = player.metaData;
             if (player.hasVideo) {
@@ -334,12 +345,22 @@ ApplicationWindow {
                         "Bitrate: " + meta.videoBitRate + " b/s<br>" +
                         "Codec: " + meta.videoCodec + "<br>";
             } else if (player.hasAudio) {
-                return "Track: " + meta.trackNumber + "<br>" +
+                return "Title: " + meta.title + "<br>" +
+                        "Subtitle: " + meta.subTitle + "<br>" +
+                        "Track: " + meta.trackNumber + "<br>" +
                         "Audio codec: " + meta.audioCodec + "<br>" +
                         "Bitrate: " + meta.audioBitRate + " b/s<br>" +
                         "Sample rate: " + meta.sampleRate + " Hz<br>" +
                         "Year: " + meta.year + "<br>" +
-                        "Genre: " + meta.lyrics;
+                        "Genre: " + meta.genre + "<br>" +
+                        "Description: " + meta.description + "<br>" +
+                        "Comment: " + meta.comment + "<br>" +
+                        "Category: " + meta.category + "<br>" +
+                        "Lang: " + meta.language + "<br>" +
+                        "Publisher: " + meta.publisher + "<br>" +
+                        "Copyright: " + meta.copyright + "<br>" +
+                        "Author: " + meta.author + "<br>" +
+                        "Channels: " + meta.channelCount;
             }
             return ""
         }
