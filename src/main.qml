@@ -207,6 +207,9 @@ ApplicationWindow {
                 id: volumeSlider
                 enabled: player.hasAudio
                 __handlePos: player.volume
+                minimumValue: 0.0
+                maximumValue: 1.0
+                stepSize: 0.1
                 onValueChanged: {
                     player.volume = value
                 }
@@ -230,7 +233,7 @@ ApplicationWindow {
             Label {
                 id: messageLabel
                 elide: Text.ElideMiddle
-                width: statusBar.width - posLabel.width
+                Layout.preferredWidth: statusBar.width - posLabel.width - 10
                 text: player.source
             }
             ProgressBar {
