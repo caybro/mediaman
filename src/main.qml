@@ -74,7 +74,8 @@ ApplicationWindow {
             console.error("MP error:" + error)
             messageLabel.text = errorString
             messageTimer.start()
-            //errorDlg.open()
+            errorDlg.errorText = errorString
+            errorDlg.open()
         }
     }
 
