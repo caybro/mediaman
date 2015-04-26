@@ -60,7 +60,7 @@ ApplicationWindow {
                 if (source.toString().substr(0,4) == "http") { // stream
                     mainWindow.title = metaData.publisher + " (" + metaData.genre + ") — " + qsTr("Mediaman")
                 } else if (!hasVideo && metaData !== undefined) { // MP3
-                    mainWindow.title = metaData.title.trim() + " - " + metaData.albumArtist.trim() +
+                    mainWindow.title = metaData.title.trim() + //" - " + metaData.leadPerformer.trim() +
                             " (" + metaData.albumTitle.trim() + ") — " + qsTr("Mediaman")
                 } else { // video
                     mainWindow.title = Functions.filenameFromUrl(source.toString()) + " — " + qsTr("Mediaman")
@@ -300,11 +300,11 @@ ApplicationWindow {
     Text {
         id: welcomeText
         anchors.centerIn: parent
-        visible: player.status == MediaPlayer.NoMedia
+        visible: player.playbackState == MediaPlayer.StoppedState
         color: palette.highlight
         text: qsTr("<h1>Welcome to Mediaman %1</h1>No media loaded.<br>Press %2 to open some...")
           .arg(Qt.application.version).arg(openAction.shortcut) +
-          "<br><br><br><br>" + "(c) 2014 Lukáš Tinkl &lt;<a href='mailto:lukas@kde.org'>lukas@kde.org</a>&gt;";
+          "<br><br><br><br>" + "(c) 2015 Lukáš Tinkl &lt;<a href='mailto:lukas@kde.org'>lukas@kde.org</a>&gt;";
         onLinkActivated: {
             Qt.openUrlExternally(link)
         }
@@ -339,7 +339,7 @@ ApplicationWindow {
         anchors.left: parent.left
         color: palette.highlight
         anchors.margins: 5
-        visible: !player.hasVideo
+        visible: player.playbackState == MediaPlayer.PausedState
         text: {
             var meta = player.metaData;
             if (player.hasVideo) {
@@ -350,6 +350,7 @@ ApplicationWindow {
             } else if (player.hasAudio) {
                 return "Title: " + meta.title + "<br>" +
                         "Subtitle: " + meta.subTitle + "<br>" +
+                        "Artist: " + meta.albumArtist + "<br>" +
                         "Track: " + meta.trackNumber + "<br>" +
                         "Audio codec: " + meta.audioCodec + "<br>" +
                         "Bitrate: " + meta.audioBitRate + " b/s<br>" +
@@ -363,6 +364,7 @@ ApplicationWindow {
                         "Publisher: " + meta.publisher + "<br>" +
                         "Copyright: " + meta.copyright + "<br>" +
                         "Author: " + meta.author + "<br>" +
+                        "Keywords: " + meta.keywords + "<br>" +
                         "Channels: " + meta.channelCount;
             }
             return ""
